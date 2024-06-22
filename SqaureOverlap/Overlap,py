@@ -1,0 +1,87 @@
+import random
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
+def squares_overlap(square1, square2):
+    """
+    Check if two squares overlap.
+    
+    :param square1: Tuple of (x1, y1, x2, y2) where (x1, y1) is the top-left corner
+                    and (x2, y2) is the bottom-right corner of the first square
+    :param square2: Tuple of (x1, y1, x2, y2) for the second square
+    :return: Boolean indicating whether the squares overlap
+    """
+    x1, y1, x2, y2 = square1
+    x3, y3, x4, y4 = square2
+    
+    # Check if one rectangle is to the left of the other
+    if x2 < x3 or x4 < x1:
+        return False
+    
+    # Check if one rectangle is above the other
+    if y2 < y3 or y4 < y1:
+        return False
+    
+    # If we get here, the rectangles overlap
+    return True
+
+def generate_and_test_rois(N, image_size=(1000, 1000), min_size=10, max_size=100):
+    rois = []
+    for _ in range(N):
+        size = random.randint(min_size, max_size)
+        x = random.randint(0, image_size[0] - size)
+        y = random.randint(0, image_size[1] - size)
+        rois.append((x, y, x + size, y + size))
+    
+    overlapping_rois = set()
+    for i in range(N):
+        for j in range(i+1, N):
+            if squares_overlap(rois[i], rois[j]):
+                overlapping_rois.add(i)
+                overlapping_rois.add(j)
+    
+    return rois, overlapping_rois
+
+def visualize_rois(rois, overlapping_rois, image_size):
+    fig, ax = plt.subplots(figsize=(10, 10))
+    ax.set_xlim(0, image_size[0])
+    ax.set_ylim(0, image_size[1])
+    ax.set_aspect('equal')
+    
+    for i, roi in enumerate(rois):
+        x, y, x2, y2 = roi
+        width = x2 - x
+        height = y2 - y
+        color = 'red' if i in overlapping_rois else 'blue'
+        rect = patches.Rectangle((x, y), width, height, linewidth=1, edgecolor=color, facecolor='none')
+        ax.add_patch(rect)
+        ax.text(x, y, str(i+1), fontsize=8, color='black')
+    
+    plt.title(f'Visualization of {len(rois)} ROIs\n'
+              f'Red: Overlapping ({len(overlapping_rois)}), '
+              f'Blue: Non-overlapping ({len(rois) - len(overlapping_rois)})')
+    plt.xlabel('X coordinate')
+    plt.ylabel('Y coordinate')
+    plt.gca().invert_yaxis()  # Invert y-axis to match image coordinates
+    plt.show()
+
+def main():
+    N = 50
+    image_size = (1000, 1000)
+    rois, overlapping_rois = generate_and_test_rois(N, image_size)
+
+    print(f"Generated {N} ROIs")
+    print(f"Number of overlapping ROIs: {len(overlapping_rois)}")
+    print(f"Number of non-overlapping ROIs: {N - len(overlapping_rois)}")
+
+    # Print first 5 ROIs as an example
+    print("\nFirst 5 ROIs:")
+    for i, roi in enumerate(rois[:5]):
+        status = "Overlapping" if i in overlapping_rois else "Non-overlapping"
+        print(f"ROI {i+1}: {roi} - {status}")
+
+    # Visualize the ROIs
+    visualize_rois(rois, overlapping_rois, image_size)
+
+if __name__ == "__main__":
+    main()
