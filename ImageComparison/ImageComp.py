@@ -4,6 +4,9 @@ import argparse
 import csv
 import numpy as np
 
+DEFAULT_ROOT = 'test_cases'
+DEFAULT_THRESHOLD = 50
+
 def find_differences(img1, img2, threshold=30):
     """
     Find and highlight significant differences between two images.
@@ -162,14 +165,14 @@ def main():
         '-r',
         '--root', 
         type=str, 
-        default='test_cases', 
+        default=DEFAULT_ROOT, 
         help='Root folder containing test case subfolders. Each subfolder should contain exactly two images to compare. Default: "test_cases"'
     )
     parser.add_argument(
         '-t',
         '--threshold', 
         type=int, 
-        default=50, 
+        default=DEFAULT_THRESHOLD, 
         help='Threshold for significant differences (0-255). Higher values detect only more significant changes. Default: 50'
     )
     args = parser.parse_args()

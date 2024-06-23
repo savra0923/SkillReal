@@ -1,0 +1,4 @@
+num_rois,image_width,image_height,min_size,max_size
+50,1000,1000,10,100
+30,800,600,20,80
+40,1200,1200,15,90

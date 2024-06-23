@@ -1,8 +1,15 @@
 import os
 import argparse
 import random
+import csv
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+
+DEFAULT_NUM_ROIS = 50
+DEFAULT_IMAGE_WIDTH = 1000
+DEFAULT_IMAGE_HEIGHT = 1000
+DEFAULT_MIN_SIZE = 10
+DEFAULT_MAX_SIZE = 100
 
 def squares_overlap(square1, square2):
     """
@@ -119,6 +126,47 @@ def visualize_rois(rois, overlapping_rois, image_size):
     plt.gca().invert_yaxis()  # Invert y-axis to match image coordinates
     plt.show()
 
+def run_single_test(num_rois, image_width, image_height, min_size, max_size):
+    print(f"Running single test with parameters: num_rois={num_rois}, "
+          f"image_width={image_width}, image_height={image_height}, min_size={min_size}, max_size={max_size}")
+    rois, overlapping_rois = generate_and_test_rois(num_rois, (image_width, image_height), min_size, max_size)
+    print(f"Generated {num_rois} ROIs")
+    print(f"Number of overlapping ROIs: {len(overlapping_rois)}")
+    print(f"Number of non-overlapping ROIs: {num_rois - len(overlapping_rois)}")
+    visualize_rois(rois, overlapping_rois, (image_width, image_height))
+
+def run_multiple_tests(csv_file):
+    """
+    Run the main test case multiple times as specified in a configuration file.
+
+    Parameters:
+    test_cases_folder (str): The path to the folder containing the test cases configuration file.
+
+    Returns:
+    None
+
+    This function reads the number of iterations to run from a configuration file named "config.txt"
+    located in the specified folder, and runs the main function for each iteration.
+    """
+    # config_path = os.path.join(csv_file, "config.txt")
+    
+    with open(csv_file, 'r') as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip header
+        for i, row in enumerate(reader):
+            try:
+                num_rois, image_width, image_height, min_size, max_size = map(int, row)
+                print(f"Running test case {i+1} with parameters: num_rois={num_rois}, "
+                      f"image_width={image_width}, image_height={image_height}, min_size={min_size}, max_size={max_size}")
+                rois, overlapping_rois = generate_and_test_rois(num_rois, (image_width, image_height), min_size, max_size)
+                print(f"Generated {num_rois} ROIs")
+                print(f"Number of overlapping ROIs: {len(overlapping_rois)}")
+                print(f"Number of non-overlapping ROIs: {num_rois - len(overlapping_rois)}")
+                visualize_rois(rois, overlapping_rois, (image_width, image_height))
+            except ValueError:
+                print(f"Invalid parameters in line {i+1}: {row}. Skipping this test case.")
+
+
 def main():
     """
     Overlapping ROIs Tool: Generate and visualize ROIs, color the overlapping ROIs a different color.
@@ -144,27 +192,28 @@ def main():
     Returns:
     None
     """
-    parser = argparse.ArgumentParser(description='Overlaping ROIs Tool: Generate and visualize ROIs, color the overlaping ROIs a different color.',
-        epilog='Example usage: python Overlap.py --num_rois 50 --image_width 1000 --image_height 1000 --min_size 10 --max_size 100\npython Overlap.py -n 50 -iw 1000 -ih 1000 -m 10 -M 100')
-    parser.add_argument('-n', '--num_rois', type=int, default=50, help='Number of ROIs to generate. default: 50')
-    parser.add_argument('-iw', '--image_width', type=int, default=1000, help='Width of the image. default: 1000')
-    parser.add_argument('-ih', '--image_height', type=int, default=1000, help='Height of the image. default: 1000')
-    parser.add_argument('-m', '--min_size', type=int, default=10, help='Minimum size of ROI. default: 10')
-    parser.add_argument('-M', '--max_size', type=int, default=100, help='Maximum size of ROI. default: 100')
+    parser = argparse.ArgumentParser(
+        description='Overlapping ROIs Tool: Generate and visualize ROIs, color the overlapping ROIs a different color.',
+        epilog='Example usage for single test: python Overlap.py -n 50 -iw 1000 -ih 1000 -m 10 -M 100\n'
+               'Example usage for multiple tests from CSV file: python Overlap.py --csv_file test_cases.csv'
+    )
+    parser.add_argument('-n', '--num_rois', type=int, default=DEFAULT_NUM_ROIS, help='Number of ROIs to generate.')
+    parser.add_argument('-iw', '--image_width', type=int, default=DEFAULT_IMAGE_WIDTH, help='Width of the image.')
+    parser.add_argument('-ih', '--image_height', type=int, default=DEFAULT_IMAGE_HEIGHT, help='Height of the image.')
+    parser.add_argument('-m', '--min_size', type=int, default=DEFAULT_MIN_SIZE, help='Minimum size of ROI.')
+    parser.add_argument('-M', '--max_size', type=int, default=DEFAULT_MAX_SIZE, help='Maximum size of ROI.')
+    parser.add_argument('-c', '--csv_file', type=str, help='CSV file containing test cases.')
     args = parser.parse_args()
 
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-    N = args.num_rois
-    image_size = (args.image_width, args.image_height)
-    rois, overlapping_rois = generate_and_test_rois(N, image_size, args.min_size, args.max_size)
-
-    print(f"Generated {N} ROIs")
-    print(f"Number of overlapping ROIs: {len(overlapping_rois)}")
-    print(f"Number of non-overlapping ROIs: {N - len(overlapping_rois)}")
-
-    # Visualize the ROIs
-    visualize_rois(rois, overlapping_rois, image_size)
+    if args.csv_file is not None:
+        run_multiple_tests(args.csv_file)
+    elif args.num_rois is not None and args.image_width is not None and args.image_height is not None \
+            and args.min_size is not None and args.max_size is not None:
+        run_single_test(args.num_rois, args.image_width, args.image_height, args.min_size, args.max_size)
+    else:
+        parser.print_help()
 
 if __name__ == "__main__":
     main()
