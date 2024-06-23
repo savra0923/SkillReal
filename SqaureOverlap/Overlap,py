@@ -1,3 +1,5 @@
+import os
+import argparse
 import random
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -66,19 +68,24 @@ def visualize_rois(rois, overlapping_rois, image_size):
     plt.show()
 
 def main():
-    N = 50
-    image_size = (1000, 1000)
-    rois, overlapping_rois = generate_and_test_rois(N, image_size)
+    parser = argparse.ArgumentParser(description='Overlaping ROIs Tool: Generate and visualize ROIs, color the overlaping ROIs a different color.',
+        epilog='Example usage: python Overlap.py --num_rois 50 --image_width 1000 --image_height 1000 --min_size 10 --max_size 100\npython Overlap.py -n 50 -iw 1000 -ih 1000 -m 10 -M 100')
+    parser.add_argument('-n', '--num_rois', type=int, default=50, help='Number of ROIs to generate. default: 50')
+    parser.add_argument('-iw', '--image_width', type=int, default=1000, help='Width of the image. default: 1000')
+    parser.add_argument('-ih', '--image_height', type=int, default=1000, help='Height of the image. default: 1000')
+    parser.add_argument('-m', '--min_size', type=int, default=10, help='Minimum size of ROI. default: 10')
+    parser.add_argument('-M', '--max_size', type=int, default=100, help='Maximum size of ROI. default: 100')
+    args = parser.parse_args()
+
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+    N = args.num_rois
+    image_size = (args.image_width, args.image_height)
+    rois, overlapping_rois = generate_and_test_rois(N, image_size, args.min_size, args.max_size)
 
     print(f"Generated {N} ROIs")
     print(f"Number of overlapping ROIs: {len(overlapping_rois)}")
     print(f"Number of non-overlapping ROIs: {N - len(overlapping_rois)}")
-
-    # Print first 5 ROIs as an example
-    print("\nFirst 5 ROIs:")
-    for i, roi in enumerate(rois[:5]):
-        status = "Overlapping" if i in overlapping_rois else "Non-overlapping"
-        print(f"ROI {i+1}: {roi} - {status}")
 
     # Visualize the ROIs
     visualize_rois(rois, overlapping_rois, image_size)

@@ -1,5 +1,6 @@
 import cv2
 import os
+import argparse
 import csv
 import numpy as np
 
@@ -75,8 +76,30 @@ def process_test_case(folder_path, results_folder, threshold):
     print(f"Number of specific pixals changed for each siginificant change is located in: {csv_path}\n")
 
 def main():
-    root_folder = "test_cases"
-    threshold = 50
+    parser = argparse.ArgumentParser(
+        description='Image Comparison Tool: Analyzes differences between pairs of images in test case folders.',
+        epilog='Example usage: python ImageComp.py --root path/to/test_cases --threshold 30 \npython ImageComp.py -r path/to/test_cases -t 30'
+    )
+    parser.add_argument(
+        '-r',
+        '--root', 
+        type=str, 
+        default='test_cases', 
+        help='Root folder containing test case subfolders. Each subfolder should contain exactly two images to compare. Default: "test_cases"'
+    )
+    parser.add_argument(
+        '-t',
+        '--threshold', 
+        type=int, 
+        default=50, 
+        help='Threshold for significant differences (0-255). Higher values detect only more significant changes. Default: 50'
+    )
+    args = parser.parse_args()
+
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+    root_folder = args.root
+    threshold = args.threshold
 
     results_folder = os.path.join(root_folder, "results")
     
