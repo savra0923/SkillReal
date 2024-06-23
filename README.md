@@ -3,6 +3,9 @@ This is answers to the SkillReal home assignment.
 This code was writen in python and ran with python 3.12.0.
 Please make sure you have the right python compiler.
 
+# Explenations
+I was asked to write an explenation for each task. Please refer to 'SkillReal Home Assignment Answers.pdf' for the answers.
+
 # Run the Code
 - Navigate to the SkillReal folder.
 - run pip install -r requirements.txt
@@ -19,3 +22,6 @@ Please make sure you have the right python compiler.
         - -M Maximum size of ROI.
     - Parameters that were not changed will use default values.
     - To run multiple times give a path to a test_cases.csv file with all needed parameters. You can use the given test_cases.csv file provided.
+
+# Disclaimer
+The image comparison task asked for test case. Except for test case 3, ALL PHOTOS USED ARE NOT MY OWN. I downloaded them from a free stock photo website and changed them a bit.
