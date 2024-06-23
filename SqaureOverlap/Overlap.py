@@ -148,7 +148,6 @@ def run_multiple_tests(csv_file):
     This function reads the number of iterations to run from a configuration file named "config.txt"
     located in the specified folder, and runs the main function for each iteration.
     """
-    # config_path = os.path.join(csv_file, "config.txt")
     
     with open(csv_file, 'r') as file:
         reader = csv.reader(file)
