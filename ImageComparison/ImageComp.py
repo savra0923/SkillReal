@@ -65,9 +65,8 @@ def analyze_changes(thresholded_diff):
     min_area = 50  
     significant_changes = [stat for stat in stats[1:] if stat[4] > min_area]  # Exclude background
 
-    num_changes = len(significant_changes)
     changes_info = [{"change_id": i, "pixels": change[4]} for i, change in enumerate(significant_changes, 1)]
-    return num_changes, changes_info
+    return len(significant_changes), changes_info
 
 def save_changes_to_csv(changes_info, csv_path):
     """

@@ -5,6 +5,7 @@ Please make sure you have the right python compiler.
 
 # Run the Code
 - Navigate to the SkillReal folder.
+- run pip install -r requirements.txt
 - For question 1, run python ImageComp.py -r path/to/test_cases -t 30.
     - Where -r is the path to the folder with the test cases folders and -t is the threshold for significant differences
     - Each test case is a folder with the 2 images we wish to compare.
